@@ -1,0 +1,12 @@
+[user]
+	name = Kiyotaka Mukasa
+	email = kytk.khhut.328@gmail.com
+[color]
+	ui = true
+[core]
+	editor = nvim
+	autocrlf = false
+[alias]
+	co = checkout
+	st = status
+	br = branch

@@ -1,0 +1,2 @@
+100
+['Shougo/dein.vim', 'Shougo/denite.nvim', 'Shougo/deoplete.nvim', 'Shougo/vimproc.vim', 'Vimjas/vim-python-pep8-indent', 'lervag/vimtex', 'scrooloose/nerdtree', 'thinca/vim-quickrun', 'tomasr/molokai', 'tpope/vim-commentary', 'tpope/vim-unimpaired', 'vim-airline/vim-airline', 'w0rp/ale', 'zchee/deoplete-jedi']
