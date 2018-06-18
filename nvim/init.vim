@@ -46,6 +46,10 @@ set number
 set encoding=utf-8
 set expandtab
 set history=200
+set mouse=a
 
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
+cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'.' : '%%'
+
+let g:python_host_prog = '/usr/bin/python2' 

@@ -2,15 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'tpope/vim-commentary'
-
-[[plugins]]
-repo = 'tpope/vim-unimpaired'
-
-[[plugins]]
-repo = 'tomasr/molokai'
-
-[[plugins]]
 repo = 'Shougo/deoplete.nvim'
 hook_add = 'let g:deoplete#enable_at_startup = 1'
 
@@ -22,7 +13,51 @@ repo = 'Shougo/vimproc.vim'
 build = 'make'
 
 [[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_add = '''
+            " Plugin key-mappings.
+            " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+            imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+            smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+            xmap <C-k>     <Plug>(neosnippet_expand_target)
+
+            " SuperTab like snippets behavior.
+            " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+            "imap <expr><TAB>
+            " \ pumvisible() ? "\<C-n>" :
+            " \ neosnippet#expandable_or_jumpable() ?
+            " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+            smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+            \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+            " For conceal markers.
+            if has('conceal')
+              set conceallevel=2 concealcursor=niv
+            endif
+            let g:tex_flavor="latex"
+            '''
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
 repo = 'scrooloose/nerdtree'
+hook_add = 'let g:NERDTreeShowHidden=1'
+
+[[plugins]]
+repo = 'jistr/vim-nerdtree-tabs'
+hook_add = '''map <C-n> <plug>NERDTreeTabsToggle<CR>
+              let g:nerdtree_tabs_open_on_console_startup=0
+           '''
+
+[[plugins]]
+repo = 'tpope/vim-commentary'
+
+[[plugins]]
+repo = 'tpope/vim-unimpaired'
+
+[[plugins]]
+repo = 'tomasr/molokai'
 
 [[plugins]]
 repo = 'vim-airline/vim-airline'
@@ -43,7 +78,7 @@ hook_add = '''
             let g:quickrun_config['tex'] = { 'command' : 'latexmk',
               \              'exec': ['%c -gg -pdfdvi %s', 'evince %s:r.pdf'],
               \               }
-            nnoremap <silent><F5> :QuickRun<CR>
+            nnoremap <silent><F5> :w<CR>:QuickRun<CR>
            '''
 
 [[plugins]]
