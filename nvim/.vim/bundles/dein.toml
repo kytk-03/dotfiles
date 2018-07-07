@@ -57,6 +57,9 @@ repo = 'tpope/vim-commentary'
 repo = 'tpope/vim-unimpaired'
 
 [[plugins]]
+repo = 'tpope/vim-surround'
+
+[[plugins]]
 repo = 'tomasr/molokai'
 
 [[plugins]]
@@ -83,3 +86,12 @@ hook_add = '''
 
 [[plugins]]
 repo = 'w0rp/ale'
+
+[[plugins]]
+repo = 'kana/vim-textobj-user'
+
+[[plugins]]
+repo = 'kana/vim-textobj-entire'
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
