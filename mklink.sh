@@ -1,5 +1,5 @@
 #!/bin/bash
 # create symbolic link
-ln -sf ~/dotfiles/nvim ~/.config/nvim
-ln -sf ~/dotfiles/.gitconfig ~/.gitconfig
-ln -sf ~/dotfiles/.latexmkrc ~/.latexmkrc
+ln -s "~/dotfiles/nvim" "~/.config/nvim"
+ln -s "~/dotfiles/.gitconfig" "~/.gitconfig"
+ln -s "~/dotfiles/.latexmkrc" "~/.latexmkrc"
