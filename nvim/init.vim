@@ -53,8 +53,8 @@ cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'.' : '%%'
 
-let g:python_host_prog = '/usr/bin/python2' 
-let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.5/bin/python' 
+let g:python_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py2.7/bin/python' 
+let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.6/bin/python' 
 source $VIMRUNTIME/macros/matchit.vim
 hi MatchParen term=standout ctermbg=LightGrey ctermfg=Black guibg=LightGrey guifg=Black
 set hidden
