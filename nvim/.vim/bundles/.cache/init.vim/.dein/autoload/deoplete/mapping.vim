@@ -9,16 +9,15 @@ function! deoplete#mapping#_init() abort
   inoremap <expr><silent> <Plug>_ deoplete#mapping#_dummy_complete()
 endfunction
 
+function! deoplete#mapping#_dummy_complete() abort
+  return "\<C-r>=deoplete#mapping#_complete()\<CR>"
+endfunction
 function! deoplete#mapping#_completefunc(findstart, base) abort
   if a:findstart
     return g:deoplete#_context.complete_position
   else
     return g:deoplete#_context.candidates
   endif
-endfunction
-function! deoplete#mapping#_dummy_complete() abort
-  return (pumvisible() ? "\<C-e>" : '')
-        \ . "\<C-r>=deoplete#mapping#_complete()\<CR>"
 endfunction
 function! deoplete#mapping#_complete() abort
   call complete(g:deoplete#_context.complete_position + 1,

@@ -56,19 +56,15 @@ class Child(logger.LoggingMixin):
                 return
 
             self._unpacker.feed(feed)
-            self.debug('_read: %d bytes', len(feed))
 
             for child_in in self._unpacker:
                 name = child_in['name']
                 args = child_in['args']
                 queue_id = child_in['queue_id']
-                self.debug('main_loop: %s begin', name)
 
                 ret = self.main(name, args, queue_id)
                 if ret:
                     self._write(stdout, ret)
-
-                self.debug('main_loop: end')
 
     def main(self, name, args, queue_id):
         ret = None
@@ -147,18 +143,17 @@ class Child(logger.LoggingMixin):
                 self.debug('Loaded Filter: %s (%s)', f.name, path)
 
     def _merge_results(self, context, queue_id):
-        self.debug('merged_results: begin')
         results = self._gather_results(context)
 
         merged_results = []
         for result in [x for x in results
                        if not self._is_skip(x['context'], x['source'])]:
-            if self._update_result(result,
-                                   context['input'], context['next_input']):
+            candidates = self._get_candidates(
+                result, context['input'], context['next_input'])
+            if candidates:
                 rank = get_custom(context['custom'],
                                   result['source'].name, 'rank',
                                   result['source'].rank)
-                candidates = result['candidates']
                 merged_results.append({
                     'complete_position': result['complete_position'],
                     'candidates': candidates,
@@ -167,7 +162,6 @@ class Child(logger.LoggingMixin):
 
         is_async = len([x for x in results if x['is_async']]) > 0
 
-        self.debug('merged_results: end')
         return {
             'queue_id': queue_id,
             'is_async': is_async,
@@ -245,16 +239,7 @@ class Child(logger.LoggingMixin):
                 self._prev_results[source.name] = result
                 results.append(result)
             except Exception as exc:
-                self._source_errors[source.name] += 1
-                if source.is_silent:
-                    continue
-                if self._source_errors[source.name] > 2:
-                    error(self._vim, 'Too many errors from "%s". '
-                          'This source is disabled until Neovim '
-                          'is restarted.' % source.name)
-                    self._ignore_sources.append(source.name)
-                    continue
-                error_tb(self._vim, 'Error from %s: %r' % (source.name, exc))
+                self._handle_source_exception(source, exc)
 
         return results
 
@@ -268,16 +253,26 @@ class Child(logger.LoggingMixin):
                 return
             context['candidates'] += convert2candidates(async_candidates)
         except Exception as exc:
-            self._source_errors[source.name] += 1
-            if source.is_silent:
-                return
-            if self._source_errors[source.name] > 2:
-                error(self._vim, 'Too many errors from "%s". '
-                      'This source is disabled until Neovim '
-                      'is restarted.' % source.name)
-                self._ignore_sources.append(source.name)
-            else:
-                error_tb(self._vim, 'Error from %s: %r' % (source.name, exc))
+            self._handle_source_exception(source, exc)
+
+    def _handle_source_exception(self, source, exc):
+        if isinstance(exc, SourceInitError):
+            error(self._vim,
+                  'Error when loading source {}: {}. '
+                  'Ignoring.'.format(source.name, exc))
+            self._ignore_sources.append(source.name)
+            return
+
+        self._source_errors[source.name] += 1
+        if source.is_silent:
+            return
+        if self._source_errors[source.name] > 2:
+            error(self._vim, 'Too many errors from "%s". '
+                  'This source is disabled until Neovim '
+                  'is restarted.' % source.name)
+            self._ignore_sources.append(source.name)
+        else:
+            error_tb(self._vim, 'Error from %s: %r' % (source.name, exc))
 
     def _process_filter(self, f, context, max_candidates):
         try:
@@ -298,7 +293,7 @@ class Child(logger.LoggingMixin):
         except Exception:
             error_tb(self._vim, 'Errors from: %s' % f)
 
-    def _update_result(self, result, context_input, next_input):
+    def _get_candidates(self, result, context_input, next_input):
         source = result['source']
 
         # Gather async results
@@ -366,8 +361,7 @@ class Child(logger.LoggingMixin):
             # Remove duplicates
             ctx['candidates'] = uniq_list_dict(ctx['candidates'])
 
-        result['candidates'] = ctx['candidates']
-        return result if result['candidates'] else None
+        return ctx['candidates']
 
     def _itersource(self, context):
         filetypes = context['filetypes']
@@ -437,10 +431,11 @@ class Child(logger.LoggingMixin):
             p = re.compile('(' + '|'.join(source.disabled_syntaxes) + ')$')
             if next(filter(p.search, context['syntax_names']), None):
                 return True
-        if (source.input_pattern != '' and
-                re.search('(' + source.input_pattern + ')$',
-                          context['input'])):
-            return False
+        for ft in context['filetypes']:
+            input_pattern = source.get_input_pattern(ft)
+            if (input_pattern != '' and
+                    re.search('(' + input_pattern + ')$', context['input'])):
+                return False
         if context['event'] == 'Manual':
             return False
         return not (source.min_pattern_length <=
@@ -449,8 +444,7 @@ class Child(logger.LoggingMixin):
     def _set_source_attributes(self, context):
         """Set source attributes from the context.
 
-        Each item in `attrs` is the attribute name.  If the default value is in
-        context['vars'] under a different name, use a tuple.
+        Each item in `attrs` is the attribute name.
         """
         attrs = (
             'converters',
@@ -469,7 +463,6 @@ class Child(logger.LoggingMixin):
             'max_pattern_length',
             'min_pattern_length',
             'sorters',
-            'vars',
         )
 
         for name, source in self._get_sources().items():
@@ -492,15 +485,15 @@ class Child(logger.LoggingMixin):
                 source.is_volatile = bool(source.filetypes)
 
     def _on_event(self, context):
+        event = context['event']
         for source_name, source in self._itersource(context):
-            if source.events is None or context['event'] in source.events:
-                self.debug('on_event: Source: %s', source_name)
+            if source.events is None or event in source.events:
                 try:
                     source.on_event(context)
                 except Exception as exc:
                     error_tb(self._vim, 'Exception during {}.on_event '
                              'for event {!r}: {}'.format(
-                                 source_name, context['event'], exc))
+                                 source_name, event, exc))
 
     def _get_sources(self):
         # Note: for the size change of "self._sources" error

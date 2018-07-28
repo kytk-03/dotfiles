@@ -224,6 +224,13 @@ on_insert_enter
 
 		Default value: v:true
 
+					*deoplete-options-on_text_changed_i*
+on_text_changed_i
+		Deoplete enables the auto completion on |TextChangedI| autocmd
+		if this value is True.
+
+		Default value: v:true
+
 						*deoplete-options-profile*
 profile
 		If it is True, deoplete will print the time information to
@@ -335,9 +342,9 @@ deoplete#initialize()
 		initialization of deoplete.
 
 						*deoplete#send_event()*
-deoplete#send_event({event})
+deoplete#send_event({event}, [{sources}])
 		Call |deoplete-source-attribute-on_event| manually.
-		{event} is event name.
+		{event} is event name.  {sources} are sources list.
 
 							*deoplete#toggle()*
 deoplete#toggle()
@@ -350,6 +357,10 @@ CUSTOM FUNCTIONS 				*deoplete-custom-functions*
 deoplete#custom#buffer_option({option-name}, {value})
 deoplete#custom#buffer_option({dict})
 		The buffer local version of |deoplete#custom#option()|.
+
+					*deoplete#custom#buffer_var()*
+deoplete#custom#buffer_var({source-name}, {var-name}, {value})
+		The buffer local version of |deoplete#custom#var()|.
 
 						*deoplete#custom#option()*
 deoplete#custom#option({option-name}, {value})
@@ -575,6 +586,12 @@ file							*deoplete-source-file*
 				from the buffer path instead of the current
 				directory.
 				(default: False)
+
+		force_completion_length
+				The completion length if the input does not
+				contain "/".
+				If it is less than 0, it is disabled.
+				(default: -1)
 
 member						*deoplete-source-member*
 		It collects members from current buffer.
@@ -834,6 +851,14 @@ input_pattern
 		Default: ''
 		Note: It means this feature is ignored.
 
+				*deoplete-source-attribute-input_patterns*
+input_patterns
+		(Dictionary)			(Optional)
+		The dictionary version of
+		|deoplete-source-attribute-input_pattern|.
+		The key is filetype and the value is input pattern.
+		Note: It is Python3 regexp.
+
 					*deoplete-source-attribute-is_bytepos*
 is_bytepos
 		(Bool)				(Optional)
@@ -958,8 +983,8 @@ name		(String)			(Required)
 
 					*deoplete-source-attribute-on_event*
 on_event	(Function)			(Optional)
-		Called for |InsertEnter|, |BufWritePost|, |DirChanged|
-		autocommands, through |deoplete#send_event()|.
+		Called for |InsertEnter|, |BufWritePost| autocommands, through
+		|deoplete#send_event()|.
 		It is useful to make cache.
 		It takes {self} and {context} as its parameter.
 

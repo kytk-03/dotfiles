@@ -666,7 +666,7 @@ eclim <https://eclim.org>
 
 * configure, which filetypes have special treatment of /* */ comments,
   matters for mix-indent-file algorithm: >
-  let airline#extensions#c_like_langs = ['c', 'cpp', 'cuda', 'go', 'javascript', 'ld', 'php']
+  let airline#extensions#c_like_langs = ['arduino', 'c', 'cpp', 'cuda', 'go', 'javascript', 'ld', 'php']
 <
 * disable whitespace checking for an individual buffer >
   " Checking is enabled by default because b:airline_whitespace_disabled
@@ -1001,6 +1001,12 @@ vim-gutentags <https://github.com/ludovicchabant/vim-gutentags>
 
 * enable/disable vim-gutentags integration >
   let g:airline#extensions#gutentags#enabled = 1
+
+-------------------------------------                     *airline-grepper*
+vim-grepper <https://github.com/mhinz/vim-grepper>
+
+* enable/disable vim-grepper integration >
+  let g:airline#extensions#grepper#enabled = 1
 
 -------------------------------------                     *airline-capslock*
 vim-capslock <https://github.com/tpope/vim-capslock>

@@ -43,12 +43,12 @@ function! ale#toggle#Toggle() abort
         call s:CleanupEveryBuffer()
         call s:DisablePostamble()
 
-        if has('balloon_eval')
+        if exists('*ale#balloon#Disable')
             call ale#balloon#Disable()
         endif
     endif
 
-    call ale#autocmd#InitAuGroups()
+    call ale#events#Init()
 endfunction
 
 function! ale#toggle#Enable() abort

@@ -12,11 +12,13 @@ function! deoplete#handler#_init() abort
     autocmd InsertLeave * call s:completion_timer_stop()
   augroup END
 
-  for event in ['InsertEnter', 'BufWritePost', 'DirChanged']
+  for event in ['InsertEnter', 'BufWritePost']
     call s:define_on_event(event)
   endfor
 
-  call s:define_completion_via_timer('TextChangedI')
+  if deoplete#custom#_get_option('on_text_changed_i')
+    call s:define_completion_via_timer('TextChangedI')
+  endif
   if deoplete#custom#_get_option('on_insert_enter')
     call s:define_completion_via_timer('InsertEnter')
   endif

@@ -48,14 +48,38 @@ set encoding=utf-8
 set expandtab
 set history=200
 set mouse=a
+set ignorecase
+set smartcase
 
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'.' : '%%'
+nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
 
-let g:python_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py2.7/bin/python' 
-let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.6/bin/python' 
+if has('unix')
+  let g:python_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py2.7/bin/python' 
+  let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.6/bin/python' 
+endif
+if has('win32') || has('win64')
+  let g:python_host_prog = 'C\:user\qpm\Anaconda'
+  let g:python3_host_prog = '' 
+endif
+
 source $VIMRUNTIME/macros/matchit.vim
 hi MatchParen term=standout ctermbg=LightGrey ctermfg=Black guibg=LightGrey guifg=Black
 set hidden
 let g:tex_conceal=''
+set spelllang+=cjk
+set spell
+
+augroup vimrc-local
+  autocmd!
+  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+augroup END
+
+function! s:vimrc_local(loc)
+  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  for i in reverse(filter(files, 'filereadable(v:val)'))
+    source `=i`
+  endfor
+endfunction

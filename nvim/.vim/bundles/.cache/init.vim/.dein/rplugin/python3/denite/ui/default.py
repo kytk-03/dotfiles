@@ -187,6 +187,7 @@ class Default(object):
 
         self._options = self._vim.current.buffer.options
         self._options['buftype'] = 'nofile'
+        self._options['bufhidden'] = 'wipe'
         self._options['swapfile'] = False
         self._options['buflisted'] = False
         self._options['modeline'] = False
@@ -280,7 +281,7 @@ class Default(object):
                                self._context['selected_icon']))
 
         for source in [x for x in self._denite.get_current_sources()]:
-            name = source.name.replace('/', '_')
+            name = re.sub('[^a-zA-Z0-9_]', '_', source.name)
             source_name = self.get_display_source_name(source.name)
 
             self._vim.command(
@@ -398,7 +399,7 @@ class Default(object):
                 'silent! syntax match deniteMatchedChar /[%s]/ '
                 'containedin=deniteMatchedRange contained'
             ) % re.sub(
-                r'([[\]\\^-])',
+                r'([\[\]\\^-])',
                 r'\\\1',
                 self._context['input'].replace(' ', '')
             ))
@@ -470,7 +471,7 @@ class Default(object):
         terms.append(abbr[:int(self._context['max_candidate_width'])])
         return (self._context['selected_icon']
                 if index in self._selected_candidates
-                else ' ') + ' '.join(terms)
+                else ' ') + ' '.join(terms).replace('\n', '')
 
     def resize_buffer(self):
         split = self._context['split']
@@ -500,27 +501,41 @@ class Default(object):
                 self.move_to_prev_line()
         elif self._context['cursor_pos'] == '$':
             self.move_to_last_line()
+        elif self._context['do'] != '':
+            self.do_command(self._context['do'])
+            return True
 
         if (self._candidates and self._context['immediately'] or
                 len(self._candidates) == 1 and self._context['immediately_1']):
-            goto = self._winid > 0 and self._vim.call(
-                'win_gotoid', self._winid)
-            if goto:
-                # Jump to denite window
-                self.init_buffer()
-                self.update_cursor()
-            self.do_action('default')
-            candidate = self.get_cursor_candidate()
-            echo(self._vim, 'Normal', '[{0}/{1}] {2}'.format(
-                self._cursor + self._win_cursor, self._candidates_len,
-                candidate.get('abbr', candidate['word'])))
-            if goto:
-                # Move to the previous window
-                self.suspend()
-                self._vim.command('wincmd p')
+            self.do_immediately()
             return True
         return not (self._context['empty'] or
                     self._denite.is_async() or self._candidates)
+
+    def do_immediately(self):
+        goto = self._winid > 0 and self._vim.call(
+            'win_gotoid', self._winid)
+        if goto:
+            # Jump to denite window
+            self.init_buffer()
+            self.update_cursor()
+        self.do_action('default')
+        candidate = self.get_cursor_candidate()
+        echo(self._vim, 'Normal', '[{0}/{1}] {2}'.format(
+            self._cursor + self._win_cursor, self._candidates_len,
+            candidate.get('abbr', candidate['word'])))
+        if goto:
+            # Move to the previous window
+            self.suspend()
+            self._vim.command('wincmd p')
+
+    def do_command(self, command):
+        self.init_cursor()
+        self._context['post_action'] = 'suspend'
+        while self._cursor + self._win_cursor < self._candidates_len:
+            self.do_action('default', command)
+            self.move_to_next_line()
+        self.quit_buffer()
 
     def move_cursor(self):
         if self._win_cursor > self._vim.call('line', '$'):
@@ -585,7 +600,8 @@ class Default(object):
         self._vim.command('highlight! link CursorLine CursorLine')
         if self._vim.call('exists', '#ColorScheme'):
             self._vim.command('silent doautocmd ColorScheme')
-            self._vim.command('normal! zv')
+            if self._vim.call('mode') == 'n':
+                self._vim.command('normal! zv')
         if self._context['cursor_shape']:
             self._vim.command('set guicursor&')
             self._vim.options['guicursor'] = self._guicursor
@@ -666,7 +682,7 @@ class Default(object):
         self._selected_candidates = []
         self._denite.gather_candidates(self._context)
 
-    def do_action(self, action_name):
+    def do_action(self, action_name, command=''):
         candidates = self.get_selected_candidates()
         if not candidates:
             return
@@ -693,6 +709,8 @@ class Default(object):
 
         self._denite.do_action(self._context, action_name, candidates)
         self._result = candidates
+        if command != '':
+            self._vim.command(command)
 
         if is_quit and (post_action == 'open' or post_action == 'suspend'):
             # Re-open denite buffer
