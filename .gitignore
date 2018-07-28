@@ -1,0 +1,7 @@
+nvim/.netrwhist
+nvim/.vim/bundles/repos/**
+nvim/.vim/bundles/.cache/**
+nvim/.vim/bundles/cache_vim
+nvim/.vim/bundles/state_vim.vim
+nvim/.vim/bundles/cache_nvim
+nvim/.vim/bundles/state_nvim.vim

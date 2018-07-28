@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 
 # Commands
-$latex            = 'uplatex -synctex=1 -halt-on-error';
-$latex_silent     = 'uplatex -synctex=1 -halt-on-error -interaction=batchmode';
-$bibtex           = 'upbibtex %O %B';
+$latex            = 'uplatex -synctex=0 -halt-on-error';
+$latex_silent     = 'uplatex -synctex=0 -halt-on-error -interaction=batchmode';
+$biber = 'biber --bblencoding=utf8 -u -U --output_safechars';
+# $bibtex           = 'upbibtex %O %B';
 $dvipdf           = 'dvipdfmx %O -o %D %S';
 $makeindex        = 'mendex %O -o %D %S';
 
