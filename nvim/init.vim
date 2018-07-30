@@ -61,8 +61,8 @@ if has('unix')
   let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.6/bin/python' 
 endif
 if has('win32') || has('win64')
-  let g:python_host_prog = 'C\:user\qpm\Anaconda'
-  let g:python3_host_prog = '' 
+  let g:python_host_prog = 'C:\Users\qpm\Anaconda3\envs\py2.7\python.exe' 
+  let g:python3_host_prog = 'C:\Users\qpm\Anaconda3\envs\py3.6\python.exe' 
 endif
 
 source $VIMRUNTIME/macros/matchit.vim
