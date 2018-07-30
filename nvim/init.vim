@@ -61,8 +61,8 @@ if has('unix')
   let g:python3_host_prog = '/home/kiyotaka/.pyenv/versions/anaconda3-5.2.0/envs/py3.6/bin/python' 
 endif
 if has('win32') || has('win64')
-  let g:python_host_prog = 'C\:user\qpm\Anaconda'
-  let g:python3_host_prog = '' 
+  let g:python_host_prog = 'C:\Users\qpm\Anaconda3\envs\py2.7\python.exe' 
+  let g:python3_host_prog = 'C:\Users\qpm\Anaconda3\envs\py3.6\python.exe' 
 endif
 
 source $VIMRUNTIME/macros/matchit.vim
@@ -84,6 +84,7 @@ function! s:vimrc_local(loc)
   endfor
 endfunction
 
+
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 
@@ -93,3 +94,13 @@ function! s:VSetSearch()
   let @/ = '\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
   let @s = temp
 endfunction
+
+command! -nargs=0 -bar Qargs execute 'args' QuickfixFilenames()
+function! QuickfixFilenames()
+  let buffer_numbers = {}
+  for quickfix_item in getqflist()
+    let buffer_numbers[quickfix_item['bufnr']] = bufname(quickfix_item['bufnr'])
+  endfor
+  return join(map(values(buffer_numbers), 'fnameescape(v:val)'))
+endfunction
+

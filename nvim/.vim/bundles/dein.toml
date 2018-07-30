@@ -98,3 +98,7 @@ repo = 'kana/vim-textobj-entire'
 
 [[plugins]]
 repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'tpope/vim-abolish'
+
