@@ -44,17 +44,10 @@ hook_add = '''
 repo = 'Shougo/defx.nvim'
 
 [[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
 repo = 'Shougo/neosnippet-snippets'
-
-[[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = 'let g:NERDTreeShowHidden=1'
-
-[[plugins]]
-repo = 'jistr/vim-nerdtree-tabs'
-hook_add = '''map <C-n> <plug>NERDTreeTabsToggle<CR>
-              let g:nerdtree_tabs_open_on_console_startup=0
-           '''
 
 [[plugins]]
 repo = 'tpope/vim-commentary'

@@ -103,3 +103,9 @@ function! QuickfixFilenames()
   endfor
   return join(map(values(buffer_numbers), 'fnameescape(v:val)'))
 endfunction
+
+let mapleader = "\<Space>"
+nnoremap <Leader>f :Denite -mode=normal file<CR>
+nnoremap <Leader>g :Denite -mode=normal grep<CR>
+nnoremap <Leader>b :Denite -mode=normal buffer<CR>
+nnoremap <Leader>m :Denite -mode=normal file_mru<CR>
