@@ -41,6 +41,9 @@ hook_add = '''
             '''
 
 [[plugins]]
+repo = 'Shougo/defx.nvim'
+
+[[plugins]]
 repo = 'Shougo/neosnippet-snippets'
 
 [[plugins]]
